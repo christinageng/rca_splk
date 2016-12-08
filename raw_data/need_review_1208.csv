@@ -1,0 +1,158 @@
+issues_id,jira_id,title,root_cause_type_id,root_cause_sub_type_id,area_id,component,sub_component,susqa_label,topology,min_topology,version,fix_version,regression,upgrading_related,migration,doc_needed,created_date,resovled_date,detailed_analysis,new_test_required,suggestion,new_cases_added,priority,related_customer_cases,related_components,Resolution,internal_caught,platform_specific,sus_automated,reviewed,sus_automated_status,display_version,total_cases,code_change,test_gap_id,improvement_role_id,"CONVERT(i.detailed_analysis USING utf8)",root_cause_type_name,root_cause_sub_type_name,area,test_gap_type_name,role_name
+369,SPL-130207,"Splunkforwarder 6.5.0 - AIX - splunkd crashes when shutting down",4,16,1,"Universal Forwarder","Universal Forwarder","Not labeled",DS/DC,DS/DC,"6.5.0 GA (Ivory)",6.5.2,TRUE,FALSE,FALSE,FALSE,"2016-10-12 02:29:00","2016-11-03 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Ivory (6.5.x)",123,True,3,5," the problem here is screwed up shutdown handling in DC + PhoneHome. We're just not clearing DC connections on shutdown ","Insufficient test","Feature is not covered",Backend,"BACKEND FUNCTIONAL TEST","TEST COVERAGE"
+370,SPL-130183,"Drilldown search for the ""Search scheduler skip ratio"" Monitoring Console health-check runs against all time instead of last 60 minutes",4,16,2,DMC,DMC,"Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory), 6.5.1",Kimono,FALSE,FALSE,FALSE,FALSE,"2016-10-12 02:29:00","2016-12-02 02:29:00",...,NULL,NULL,0,Critical,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Ivory (6.5.x)",123,True,2,5,"There appears to be a bug in splunk_monitoring_console\default\checklist.conf.
+After running the Health Checks, the GUI drill-down for ""Search scheduler skip ratio"" states ""This checks whether scheduled searches were skipped in the past hour."", but that is not correct. It actually searches all time instead of the last 60 minutes.
+I added earliest=-60m to the configuration to resolve it.","Insufficient test","Feature is not covered",UI,"UI FUNCTIONAL","TEST COVERAGE"
+371,SPL-130119,"azerty keyboard (French) cannot type a number using DATASET",4,37,2,SplunkWeb,Datasets,"Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory)",6.5.2,FALSE,FALSE,FALSE,FALSE,"2016-10-12 02:29:00","2016-11-18 02:29:00",...,NULL,NULL,0,Minor,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Ivory (6.5.x)",123,True,2,5,"Problem Evaluation:
+Using French Azerty keyboard, number cannot be entered into the text input field. In Azerty keyboard number can be entered only using shift key combination (Shift + 1 for 1). If shift key is pressed, we are preventing the default event which causes this issue.
+Resolution:
+KeyboardEvent.key readonly property is used for deciding the value of the key pressed instead of ev.which property. https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key If the key property is not available then keyboardUtil.isNumber method is used. From my testing only safari is not supporting KeyboardEvent.key property.","Insufficient test",Globalization,UI,"UI FUNCTIONAL","TEST COVERAGE"
+372,SPL-130025,"Order of Apps in dropdown menu not consistent from Launcher Home",4,16,2,SplunkWeb,"App Browser","Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory)",6.5.1,TRUE,TRUE,FALSE,FALSE,"2016-10-10 02:29:00","2016-10-26 02:29:00",...,NULL,NULL,0,Minor,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Ivory (6.5.x)",123,True,2,5,"Problem Evaluation:
+In 6.5 userpref model is passed during the creation of splunkbar and the apps are not sorted based on the user preference.
+In 6.4 userpref model is NOT passed during the creation of splunkbar. User preference is fetched first and then apps are sorted.
+Resolution:
+Apps are now sorted based on the user preference.","Insufficient test","Feature is not covered",UI,"UI FUNCTIONAL","TEST COVERAGE"
+373,SPL-129871,"Changing the timerange value from the edit input dropdown, does not update the timerange value of the time input element on the dashboard",4,16,2,SplunkWeb,"Dashboard Editor","Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory)",6.5.2,TRUE,FALSE,FALSE,FALSE,"2016-10-07 02:29:00","2016-12-02 02:29:00",...,NULL,NULL,0,Minor,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Ivory (6.5.x)",123,True,2,5,"Problem Evaluation:
+There are 2 issues here:
+When you add a time input and change the timerange value from the edit dropdown, the form input time element is not updated with new values.
+When you have different values for default timerange settings in the edit dropdown and for actual form input time element and if you switch to some other input type from edit dropdown and then switch back to the time input, the default timerange value is changed to the value of actual form input time element.
+For the first issue, we are not explicitly mentioning the earliest and latest timerange values while adding the time input
+For the second issue, we were unsetting the default property of time input whenever we would change the form input type to anything other than time. So, in this case when you go back to the time input, since now there is no default property, the default timerange value would be same as what we have for the form time input element.
+Note: Its not necessary to have the same timerange values for form input time element and for timerange in the edit dropdown. The default timerange value is something which will always be used whenever you load the dashboard. Once the dashboard is loaded, you can keep changing the timerange value from the form input type element. After this when you reload the dashboard, the timerange will be set back to the value which is in the default timerange under the edit dropdown.
+Resolution:
+For the first issue, added the default earliest and latest values (all-time) for adding a new input.
+For the second issue, added a fix where we would store the default timerange value in a variable which can be used later if we switch back to the time input again. This will prevent the default timerange value from changing when you switch to different input type or back to time input.","Insufficient test","Feature is not covered",UI,"UI FUNCTIONAL","TEST COVERAGE"
+374,SPL-129870,"PDF and CSV attachments don't show up when viewing email on iPhone's default mail application",4,16,2,SplunkWeb,Alerting,"Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory)",6.5.2,TRUE,FALSE,FALSE,FALSE,"2016-10-07 02:29:00","2016-10-12 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",SQA-5783,0,n/a,"Ivory (6.5.x)",123,True,2,5,"Problem Evaluation:
+There were several changes made in SPL-126393 for the 6.5 release
+For the HTML emails, the _subtype of MIMEMultipart was changed from ""mixed"" to ""related"" which was not working for iPhone's default mail application
+Resolution:
+Went through the MIMEMultipart documentation and did a research online. Finally found out that we should use ""mixed"" as _subtype of MIMEMultipart.
+Here are couple of links where other users also confirmed that we should use ""mixed"":
+http://stackoverflow.com/questions/23397654/python-smtplib-sendmail-mime-multipart-body-doesnt-shown-on-iphone
+http://stackoverflow.com/questions/28418491/why-does-iphone-not-display-attachments-sent-by-python-2-7-x","Insufficient test","Feature is not covered",UI,"UI FUNCTIONAL","TEST COVERAGE"
+375,SPL-129638,"Search returns error ""Application does not exist: appname"" when running the search from user created app",12,57,1,Search,"Search - Distributed","Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory)",6.5.1,FALSE,FALSE,FALSE,FALSE,"2016-10-04 02:29:00","2016-10-28 02:29:00",...,NULL,NULL,0,Major,1,NULL,Delivered,FALSE,Windows,NO,0,n/a,"Ivory (6.5.x)",123,False,99,7,"Shorten their path lengths to meet windows length limit fixed issue
+Around the root cause of the issue there is a ticket open to better document how to best avoid hitting the limit when creating a deployment. SPL-129334","False Alarm",Invalid,Backend,"NOT SET","FALSE ALARM"
+376,SPL-129476,"search is always ""parsing job...."" after upgrading to 6.5",3,11,2,SplunkWeb,"Search - UI","Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory), 6.5.1",6.5.1,TRUE,TRUE,FALSE,FALSE,"2016-09-29 02:29:00","2016-10-14 02:29:00",...,NULL,NULL,0,Minor,4,NULL,Workaround,TRUE,"Cross Platforms",NO,0,n/a,"Ivory (6.5.x)",123,False,1,4,"Investigation
+If stale files remain in the cache after the upgrade we see javascript error son the console which do not let the search page to display results. During my troubleshooting on the dev tools, cache clearing happened often. So the repro kept vanishing away. Based on the error from i18n.js (Type Error: _i18n_plural is not a function) seen on the console we could find a relevent jira - https://jira.splunk.com/browse/SPL-121616
+Resolution
+Clearing browser cache fixes the issue. Resolving this issue for now. Working with core dev to see if we can create a story to fix this issue for a future release.","Coding flaws","Code not to requirements",UI,"DEV TEST","CODING STANDARD"
+377,SPL-111939,"The report ""save as report"" and ""edit search"" dialogs allow to accelerate a search that uses macros, eventtypes or tags even though we do not fully support that",4,24,2,SplunkWeb,"Search - UI","Not labeled",Standalone,Standalone,"6.5.0 GA (Ivory), 6.5.1",6.3.5,FALSE,FALSE,FALSE,FALSE,"2016-01-07 02:29:00","2016-03-31 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Ivory (6.5.x)",123,True,2,5,"Both the report ""save as report"" and ""edit search"" dialogs allow to accelerate a search that uses macros, eventtypes or tags even though we do not fully support that - see SPL-110796.","Insufficient test","Missing test check point",UI,"UI FUNCTIONAL","TEST COVERAGE"
+378,SPL-130117,"diag fails to run on system where sslConfig is missing from server.conf",4,16,1,Diag,Diag,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",None,FALSE,FALSE,FALSE,FALSE,"2016-10-12 02:29:00","2016-10-26 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,True,3,5,"Attempted to run ""splunk diag"" and received the error message of ""An error occurred: no 'sslConfig' stanza exists in server.conf. Your configuration may be corrupt or may require a restart"" if there is no sslConfig config in server.conf","Insufficient test","Feature is not covered",Backend,"BACKEND FUNCTIONAL TEST","TEST COVERAGE"
+379,SPL-129722,"IE 11 stuck at ""Loading page..."".",6,33,2,SplunkWeb,"Search - UI","Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",6.4.6,FALSE,FALSE,FALSE,FALSE,"2016-10-05 02:29:00","2016-11-22 02:29:00",...,NULL,NULL,0,Major,1,NULL,"Won't Do",FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,True,99,7,"Turns out the customer was trying to use IE 11 in document mode 5.","By design","By design",UI,"NOT SET","FALSE ALARM"
+380,SPL-129538,"loadjob on Search Head Cluster (SHC) brings oldest run rather than latest",4,16,1,SHC,Search,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy), 6.4.1",6.4.5,TRUE,FALSE,FALSE,FALSE,"2016-10-03 02:29:00","2016-10-21 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",SQA-5757,0,n/a,"Galaxy (6.4.x)",123,True,3,5,"I have looked into the change in SPL-106877 to check if we can retain 'desc' as the default sorting order for 'history' endpoint. It doesn't seem feasible. The sort order of result set is handled by Paginator class for which the default sort order is 'asc'. Before SPL-106877 we used to explicitly set sort order to 'desc' in SavedSearchAdminHandler::handleHistoryAction(), _paginator.setAscending(false);
+In side handleHistoryAction() we don't have access to 'sort_key' and 'sort_dir' HttpArguments, so we can't check whether top layer requested specific sort order, in order to default it to 'desc' in case none was specified.","Insufficient test","Feature is not covered",Backend,"BACKEND FUNCTIONAL TEST","TEST COVERAGE"
+381,SPL-128917,"[Analysis Requested] License Usage does not match with RolloverSummary, also, how to report license usage by source type?",6,29,1,Licensing,Licensing,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",6.4.6,FALSE,FALSE,FALSE,FALSE,"2016-09-16 02:29:00","2016-11-21 02:29:00",...,NULL,NULL,0,Minor,1,NULL,Delivered,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,3,"index=_internal type=Usage | rex "" st=\""+(?<st>[^\""]+)"" | timechart sum(b) as total_bytes by st
+If license slaves and master are all kept online and are able to communicate at all times, the accumulation of type=Usage in license_usage.log will precisely match type=RolloverSummary, which is what is actually used for license usage enforcement.
+There may be inconsistencies and/or slippage when the slaves are unable to talk to the master, because type=Usage may not be logged in those cases. It is still computed, accounted and passed on to the master, but it won't necessarily be spelled-out in details with type=Usage - one such case would be if one license slave were restarted without being able to send some usage info. It would then only send to the license server its persisted usage (meaning, local aggregated usage) when it started back up, and that doesn't get logged under type=Usage. It will be accounted for rollover and logged as type=RolloverSummary, producing a summary that is higher than logged type=Usage.","By design","Customer lack of splunk knowledge",Backend,"NOT SET","PRODUCT USABILITY"
+382,SPL-128627,"Specific search slow to return results from a subset of non-clustered indexers",5,17,1,Search,"Search - Lookups","Not labeled",Indexer/SH,Indexer/SH,"6.4.0 GA (Galaxy)",None,FALSE,FALSE,FALSE,FALSE,"2016-09-13 02:29:00","2016-10-07 02:29:00",...,NULL,NULL,0,Major,1,NULL,Delivered,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,3,"Ran search from search head, then showed the customer the search process on the indexer in epoll_wait for the pipe from the lookup:
+splunk     387  0.2  0.0 1086864 61044 ?       Sl   13:34   0:01      \_ [splunkd pid=8068] search --id=remote_plsplunksrch03_1475861686.22402 --maxbuckets=0 --ttl=60 --maxout=0 --maxtime=0 --lookups=1 --streaming --outCsv=true --user=mvunnam --pro --roles=admin:it_unix:power:user
+splunk     388  0.0  0.0  64680  6148 ?        Ss   13:34   0:00          \_ [splunkd pid=8068] search --id=remote_plsplunksrch03_1475861686.22402 --maxbuckets=0 --ttl=60 --maxout=0 --maxtime=0 --lookups=1 --streaming --outCsv=true --user=mvunnam --pro --roles=admin:it_unix:power:user [process-runner]
+splunk   13411  0.0  0.0 126960  6656 ?        Ss   13:40   0:00              \_ /opt/splunk/bin/python /opt/splunk/var/run/searchpeers/plsplunksrch03-1475846325/system/bin/external_lookup.py host ip
+Ran the search without the lookup to generate a list of the IPs we would be reverse-resolving.
+Move the output of this search (same search without tags, piped to stats values(sourceip)) to the indexer, and looped over its contents, timing the reverse resolution of each ip. Some return quickly, but the majority take between 3 and 5 seconds. With thousands of IPs in the results, this drastically increases the runtime.
+With the lookup removed (commented out the lookup_rdns in props.conf for these sourcetypes), the search runs as expected.
+Customer will work to resolve this issue in his environment.","Configuration flaws ",Misconfiguration,Backend,"NOT SET","PRODUCT USABILITY"
+383,SPL-128497,"Security Vulnerability affecting Splunk (confirmation and documentation requested)",12,57,1,ProdSec,ProdSec,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",None,FALSE,FALSE,FALSE,FALSE,"2016-09-12 02:29:00","2016-09-23 02:29:00",...,NULL,NULL,0,Major,1,NULL,Delivered,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,7,"Response for Support (targeting the external reporter): Thank you for bringing this issue to our attention. Splunk investigated the use of ElementTree module within our codebase and concluded that Splunk Enterprise is not vulnerable to the particular set of issues identified under: http://bugs.python.org/issue27863. Splunk Enterprise uses the Python ElementTree module in multiple locations within the codebase - some within the core platform and some within python SDK. The vulnerability classes (use-after-free, type confusion and array-index-out of bounds) that were described within http://bugs.python.org/issue27863 do not directly affect Splunk Enterprise or the SDK directly because the Splunk Enterprise codebase doesn't follow any of the usage patterns. Splunk's Product Security team continues to monitor these Python security vulnerabilities and will re-evaluate in conjunction with future Python releases or our understanding of impact changes.","False Alarm",Invalid,Backend,"NOT SET","FALSE ALARM"
+384,SPL-127863,"One or more replicated indexes may not be fully searchable",6,29,1,IC,"Bucket Management","Not labeled","Index Clustering","Index Clustering","6.4.0 GA (Galaxy)",None,FALSE,FALSE,FALSE,FALSE,"2016-08-31 02:29:00","2016-11-22 02:29:00",...,NULL,NULL,0,Major,1,NULL,Delivered,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,3,"In Indexer Cluster once a bucket gets frozen from a peer it will be marked as frozen and inform the CM, in turn the CM distributes the info to the peers holding the replicated buckets. But the replicated buckets will be actually frozen when it meets the conditions for freezing buckets of each peer. That's the reason for the buckets with frozen = 1 without primary","By design","Customer lack of splunk knowledge",Backend,"NOT SET","PRODUCT USABILITY"
+385,SPL-127732,"(Cloud version) - Search Usage Stats.. median/cumulative fields not sorting correctly",4,16,2,DMC,"DMC - Dashboard","Not labeled",Cloud,Standalone,"6.4.0 GA (Galaxy)",JackHammer,FALSE,FALSE,FALSE,FALSE,"2016-08-31 02:29:00","2016-10-14 02:29:00",...,NULL,NULL,0,Critical,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,True,2,5,"These two parts of the search should be converted to use fieldformat to alter the display format of the fields instead of altering the underlying value of the fields directly:
+| eval median_runtime = `sim_convert_runtime(median_runtime)`
+| eval cum_runtime = `sim_convert_runtime(cum_runtime)`","Insufficient test","Feature is not covered",UI,"UI FUNCTIONAL","TEST COVERAGE"
+386,SPL-127436,"syslog Forwarding Does Not Work With IPv6+UDP Connection",4,16,1,"Universal Forwarder","Universal Forwarder","Not labeled","IDX+ UF","IDX+ UF","6.4.0 GA (Galaxy), 6.4.2",6.4.5,FALSE,FALSE,FALSE,FALSE,"2016-08-26 02:29:00","2016-11-01 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,True,3,5,"Putting the code in the debugger leads to sendmsg system call failing when using the IPV6
+src/util/PollableDescriptor.cpp
+ssize_t PollableDescriptor::sendtov(const IPv46SocketAddress& addr, const struct portable_iovec *vec, unsigned n, int flags) const DEFINE_NEVER_THROWS
+{
+        struct msghdr msg;
+        memset(&msg, 0, sizeof(msg));
+        msg.msg_name = const_cast<void *>((const void *) &addr._addr.gen),
+        msg.msg_namelen = (socklen_t) sizeof(addr._addr.gen);
+        msg.msg_iov = const_cast<struct portable_iovec *>(vec);
+        msg.msg_iovlen = n;
+        return sendmsg(as_socket(), &msg, flags);","Insufficient test","Feature is not covered",Backend,"BACKEND FUNCTIONAL TEST","TEST COVERAGE"
+387,SPL-127208,"Events getting truncated and partially ingested",5,17,1,"Index Processor","Data Indexing","Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",None,FALSE,FALSE,FALSE,FALSE,"2016-08-23 02:29:00","2016-09-30 02:29:00",...,NULL,NULL,0,Critical,1,NULL,Workaround,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,3,"Customer is revamping their setup after they have significantly reduced the occurrences of any improperly broken lines significantly via configuration. We are currently awaiting an update from their side. That being said. the perl script that the customer is using is a little suspect (just found it buried in the case notes). There is some indication that the issue is still occurring even with the customer just copying the files into place, but we need confirmation.","Configuration flaws ",Misconfiguration,Backend,"NOT SET","PRODUCT USABILITY"
+388,SPL-126100,"Splunk field extraction using delimiter as "" (double quote) works in preview but fails to create a valid search extraction",4,19,2,IFX,IFX,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",6.4.5,FALSE,FALSE,FALSE,FALSE,"2016-08-09 02:29:00","2016-10-12 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",JACKHAMMER-15277,0,n/a,"Galaxy (6.4.x)",123,True,2,5,"The root cause is that we are not escaping the double quote when writing to transforms.conf so it is being interpreted at DELIMS="""" and erroring out because it doesn't see any delimiter set.","Insufficient test","Boundary case",UI,"UI FUNCTIONAL","TEST COVERAGE"
+389,SPL-124748,"License Usage report wrong figure while acceleration enabled",6,29,1,Search,"Search - Report Acceleration","Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy), 6.4.1",None,FALSE,FALSE,FALSE,FALSE,"2016-07-20 02:29:00","2016-09-12 02:29:00",,NULL,NULL,0,Major,1,NULL,Delivered,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,3,,"By design","Customer lack of splunk knowledge",Backend,"NOT SET","PRODUCT USABILITY"
+390,SPL-124689,"Fields are not showing up on the left hand side if they only include null value.",6,29,1,Search,Search-Language,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",None,FALSE,FALSE,FALSE,FALSE,"2016-07-20 02:29:00","2016-09-19 02:29:00",...,NULL,NULL,0,Major,1,NULL,Delivered,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,3,"As noted by Emanuel House - the problem here is the difference between EMPTY string (,"""",) and NULL string (,,). 
+Issue can be easily reproduced. Not sure what's the expected behavior - i mean those are actually two different cases (empty string is still a string; null value is a different story), but from the CSV point of view it's the same (empty value).
+Looking at the code - this is intentional:
+INTERNAL (do not share with the customer)
+Timeliner.cpp
+...
+KeyStats::emit(FileStar& f, const Str& k)
+{
+    if (_count == 0)
+        return; // skip fields where no value was added
+...
+}
+...
+Filed is not shown on the list of Interesting Fields but still is searchable:
+index=top10 source=/home/oracle/workdir/account_log.csv | where isnull(STATUS)
+To make it appear the customer could try this:
+ index=top10 source=/home/oracle/workdir/account_log.csv DIFF=""""  | eval STATUS=if(isnull(STATUS),""NULL"",STATUS)
+This will make the STATUS to appear with value set to NULL instead (so the statistics should be also correct).","By design","Customer lack of splunk knowledge",Backend,"NOT SET","PRODUCT USABILITY"
+391,SPL-123604,"[PDF delivery] Missing timezone information at PDF footer",4,21,1,Search,"Search - Scheduler","Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",6.4.5,FALSE,FALSE,FALSE,FALSE,"2016-06-29 02:29:00","2016-11-14 02:29:00",...,NULL,NULL,0,Major,1,"PDF generator",Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,True,3,5,"It appears all scheduled searches run as splunk-system-user and generate the footer timestamp based on that users preferred timezone (which in this case is always system time).","Insufficient test","Component integration test",Backend,"BACKEND FUNCTIONAL TEST","TEST COVERAGE"
+392,SPL-123630,"[Regression:] diag fails when index path directory names are shorter than SPLUNK_HOME",4,19,1,Diag,Diag,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy), 6.4.1, 6.4.2, 6.4.3",6.4.3,FALSE,FALSE,FALSE,FALSE,"2016-06-29 02:29:00","2016-07-15 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",SQA-4868,0,n/a,"Galaxy (6.4.x)",123,True,3,5,"if a coldPath, homePath, summary Path etc are shorter than SPLUNK_HOME, we get this exception.","Insufficient test","Boundary case",Backend,"BACKEND FUNCTIONAL TEST","TEST COVERAGE"
+393,SPL-122219,"""Orphaned Scheduled Searches"" search can fail in a rest call timeout if LDAP, SAML, requests for all users take more than 60 seconds",4,20,1,REST,REST,"Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",6.4.6,FALSE,FALSE,FALSE,FALSE,"2016-06-08 02:29:00","2016-11-18 02:29:00",...,NULL,NULL,0,Major,1,"SAML, LDAP",Fixed,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,True,4,5,"Problem evaluation:
+The problem is due to it takes more time for LDAP, SAML request to return if customers has large user base.
+Resolution:
+Increase the timeout for waiting the rest call return. This should be helpful for some customers. And for the underline performance problem https://jira.splunk.com/browse/SPL-129285 is used to track the work.","Insufficient test","Product integration test",Backend,"GLOBAL TEST","TEST COVERAGE"
+394,SPL-119318,"Splunk Forwarder Takes A Long Time to Shutdown on HPUX",6,29,1,"Universal Forwarder","Universal Forwarder","Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy)",None,FALSE,FALSE,FALSE,FALSE,"2016-04-29 02:29:00","2016-11-28 02:29:00",...,NULL,NULL,0,Critical,1,NULL,Workaround,FALSE,"Cross Platforms",NO,0,n/a,"Galaxy (6.4.x)",123,False,99,3,"Add this attribute in the inputs.conf file. 
+
+DelayArchiveProcessorShutdown = 1 
+
+
+DelayArchiveProcessorShutdown = <bool> 
+* Specifies whether during splunk shutdown archive processor should finish processing archive file under process. 
+* If set to false archive processor abandons further processing of archive file and will process again from start again. 
+* If set to true archive processor will complete processing of archive file. Shutdown will be delayed. 
+* defaults to false ","By design","Customer lack of splunk knowledge",Backend,"NOT SET","PRODUCT USABILITY"
+395,SPL-102939,"Archive Processor cannot handle zip files if they contain Japanese characters in the file name.",4,37,1,"File Input","File Input","Not labeled",Standalone,Standalone,"6.4.0 GA (Galaxy), 6.4.1, 6.4.2",6.4.3,FALSE,FALSE,FALSE,FALSE,"2016-06-09 02:29:00","2016-08-02 02:29:00",...,NULL,NULL,0,Major,1,NULL,Fixed,FALSE,"Cross Platforms",SQA-5105,0,n/a,"Galaxy (6.4.x)",123,True,3,5,"Figured out how the to_charset is set to 0x7ff69c88c140 ""ANSI_X3.4-1968"" for the converter ""sc"" in the below function, which will finally result in the error message ""ERROR ArchiveFile - In archive '/home/rkondo/splunk623/splunk/var/log/japanesezip/06_xxxx_filename_utf8.zip': Pathname cannot be converted from UTF-8 to current locale.""
+int
+_archive_entry_copy_pathname_l(struct archive_entry *entry,
+    const char *name, size_t len, struct archive_string_conv *sc)
+The to_charset is obtained from the below function in archive_string.c
+static const char *
+default_iconv_charset(const char *charset) {
+        if (charset != NULL && charset[0] != '\0')
+                return charset;
+#if HAVE_LOCALE_CHARSET && !defined(__APPLE__)
+        /* locale_charset() is broken on Mac OS */
+        return locale_charset();
+#elif HAVE_NL_LANGINFO
+        return nl_langinfo(CODESET);
+#else
+        return """";
+#endif
+}
+In my local repro case, this below line is hit and returned ""ANSI_X3.4-1968"".
+#elif HAVE_NL_LANGINFO
+        return nl_langinfo(CODESET);
+#else
+However, my local locale setting is using UTF-8.
+tgou@ubuntu:~/workspace/dash/build/var/log/splunk$ locale
+LANG=en_US.UTF-8
+LANGUAGE=
+LC_CTYPE=""en_US.UTF-8""
+LC_NUMERIC=""en_US.UTF-8""
+LC_TIME=""en_US.UTF-8""
+LC_COLLATE=""en_US.UTF-8""
+LC_MONETARY=""en_US.UTF-8""
+LC_MESSAGES=""en_US.UTF-8""
+LC_PAPER=""en_US.UTF-8""
+LC_NAME=""en_US.UTF-8""
+LC_ADDRESS=""en_US.UTF-8""
+LC_TELEPHONE=""en_US.UTF-8""
+LC_MEASUREMENT=""en_US.UTF-8""
+LC_IDENTIFICATION=""en_US.UTF-8""
+LC_ALL=
+tgou@ubuntu:~/workspace/dash/build/var/log/splunk$ locale charmap
+UTF-8
+It turns out the problem is that the program will use the default locale - ""C""/""POSIX"" but not the system's locale unless we set so:
+setlocale(LC_ALL, """");
+Adding the below change, I do the the problem go away and we can successfully index the zip file.
+#include <locale.h>
+
+#elif HAVE_NL_LANGINFO
+        setlocale(LC_ALL, """");
+        return nl_langinfo(CODESET);
+#else
+So looks to me we might need to apply a patch to libarchive for support this. Mitch Blank Does this approach looks ok to you? Do you have any suggestion? Thanks!","Insufficient test",Globalization,Backend,"BACKEND FUNCTIONAL TEST","TEST COVERAGE"
