@@ -1,0 +1,12 @@
+<nav>  
+  <collection label="Home" >
+    <view name="RCA_homepage" default="true" />
+  </collection>
+  <view name="search" default='true' />
+  <collection label="RCA reports by Core Release">
+    <!--<view name="splunk_enterprise_customer_issue_rca_report_sample"/>-->
+    <view name="RCA_comparison"/>
+    <view name="RCA_report"/>
+	<view name="RCA_actions"/>
+  </collection>
+</nav>
