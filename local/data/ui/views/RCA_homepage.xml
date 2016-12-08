@@ -1,0 +1,61 @@
+<dashboard>
+  
+  <label>Introduction to RCA</label>
+
+
+  <!-- First row of panels -->
+  <row>
+
+    <html>
+      <div class="content_width">
+      <h1>Root Cause Analysis</h1>
+      <p>
+        Root cause analysis (RCA) is a method of problem solving used for identifying the root causes of faults or problems.  Customer bug root cause analysis will help QA to better understand how end user uses our product better and find out where to find out the bugs before end user or even help the development team to think how to prevent the bugs happen from software development lifecycle.
+      </p>
+        
+      <h1 style="padding-top: 6px">RCA Target</h1>
+      <h2>
+      Analyze the root causes customer issues according to the timeline based on release.
+      </h2>
+        <li>
+          Customer issues from sustaining engineers
+        </li>
+        <li>Bugs are valid with status closed or resolved</li>
+        <li>Ember: https://jira.splunk.com/issues/?filter=29697</li>
+        <li>Galaxy: https://jira.splunk.com/issues/?filter=29711</li>
+        <li>Ivory: https://jira.splunk.com/issues/?filter=29711</li>
+      <h2>
+        Generate RCA report for each major release, the RCA report will include.
+      </h2>
+        <li>How many issues in total</li>
+        <li>How many issues in each RCA category</li>
+        <li>For the item which has the highest bug number, what’s the following-up plan</li>
+      <h2>
+      Generate Spunk quality leakage trend analysis based on RCA for each major release.
+      </h2>
+        <li>
+          Automation catch-up status for those issues
+        </li>
+        <li>
+          Customer bug trend in each major/minor relea
+        </li>
+        <li>
+          Automation functional followup item tracking and progress reporting
+        </li>
+      <h1 style="padding-top: 6px">About this app</h1>
+        
+        <p>Use this app to manage RCA results and analytics.
+          <br />
+        </p>
+        <p>
+          If you want to learn more about a particular module refer to the
+          <a target="_blank" href="https://confluence.splunk.com/display/SHAN/RCA+APP+by+splunk">RCA Introduction</a>.
+        </p>
+      
+      </div>      
+    </html>
+  
+
+  </row>
+
+</dashboard>

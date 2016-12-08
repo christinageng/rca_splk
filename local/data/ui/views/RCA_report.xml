@@ -1,0 +1,1002 @@
+<form script="rca.js">
+  <label>Splunk Enterprise Customer Bug RCA Report</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" token="version" searchWhenChanged="true">
+      <label>Select Splunk Version:</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <populatingSearch fieldForValue="display_version" fieldForLabel="display_version">
+        <![CDATA[index=rca_jira | stats count by display_version]]>
+      </populatingSearch>
+      <change>
+        <condition label="*">
+          <set token="showversion">$label$</set>
+          <set token="version.value">$value$</set>
+        </condition>
+        <condition label="All">
+          <set token="showversion">All</set>
+          <set token="version.value">*</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+       <h1>
+         RCA Project Overview
+        </h1>
+     
+      <ul>
+        <li>Root cause analysis based on the customer bugs after 6.3.x (Ember) in JIRA</li>
+        <li>Excluded the bugs with following resolutions: Withdrawn, Invalid, Cannot Reproduce, Duplicate, Incomplete, Already Fixed, As Designed, Won't Fix</li>
+        <li>Due to its a part time work, data are only updated to below releases (it will be changed ongoingly)
+          <ul>
+          <li>Ember: 6.3.3.1</li>
+          <li>Galaxy: 6.4.0 (GA)</li>
+          <li>Ivory: 6.5.0 (GA)</li>
+          </ul>
+        </li>
+      </ul>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Customer issues status distribution</title>
+      <chart id="all_jira_issue_status">
+        <search>
+          <query>index=rca_jira display_version="$version.value$" | stats count by "status" | sort -count</query>
+        </search>
+        <!-- Set the type of of drilldown, since we will always consume the same field, use row-->
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="root_cause_type_name">$row.status$</set>
+        </drilldown>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.1</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Customer issues summary</title>
+      <single>
+        <search>
+          <query>index=rca_jira display_version="$version.value$" |stats count</query>
+        </search>
+        <option name="underLabel">Total $showversion$ valid cases</option>
+        <option name="field">total</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">true</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="linkView">search</option>
+      </single>
+      <single>
+        <search>
+          <query>index=rca_jira display_version="$version.value$" index=rca_jira status="Closed" OR status="Resolved"|stats count</query>
+        </search>
+        <option name="underLabel">Closed and Resolved cases</option>
+        <option name="field">count</option>
+        <option name="useColors">true</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <title>RCA progress</title>
+      <single>
+        <searchString>index=rca_main display_version="$version.value$" root_cause_type_name!="NULL"|stats count</searchString>
+        <option name="underLabel">Total analysed $showversion$ valid cases</option>
+        <option name="field">count</option>
+        <option name="useColors">true</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+      </single>
+      <single>
+        <searchString>index=rca_jira display_version="$version.value$" status="Closed" OR status="Resolved" |stats count as total | eval backlog=total-[search index=rca_main display_version="$version.value$"| stats count as done | return $done]|fields backlog</searchString>
+        <option name="underLabel">RCA backlog of $showversion$</option>
+        <option name="field">count</option>
+        <option name="useColors">true</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <drilldown>
+          <set token="ws_component_name">$row.component$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_jira display_version="$version.value$" status="Closed" OR status="Resolved" NOT ([search index=rca_main |return 10000 jira_id])&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h1>
+         Root Cause Analysis By Resolution 
+       </h1>
+     
+      <ul>
+        <p>There are two analysis perspectives: 1. bug resolution with the code change, 2. bug resolution without code change</p>
+      </ul>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Bugs distribution by code change</title>
+      <chart id="issue_codechange">
+        <search>
+          <query>index=rca_main display_version="$version.value$" |eval codechanged=if(code_change="False", "w/o code change", "w/ code change") | stats count by codechanged</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.1</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">None</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>w/ code change bugs root cause distribution</title>
+      <chart id="issue_codechange_rca">
+        <search>
+          <query>index=rca_main display_version="$version.value$"  code_change!="False" | stats count by root_cause_type_name | sort count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.1</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">None</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="w_root_cause_type_name">$row.root_cause_type_name$</set>
+        </drilldown>
+      </chart>
+      <chart id="w_detail_subtype" depends="$w_root_cause_type_name$">
+        <option name="height">150px</option>
+        <title>Detail: $w_root_cause_type_name$</title>
+        <search>
+          <query>index=rca_main display_version="$version$" code_change!="False"  root_cause_type_name="$w_root_cause_type_name$"| stats count by "component"| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="ws_component_name">$row.component$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$"  code_change!="False"  root_cause_type_name="$w_root_cause_type_name$" component="$ws_component_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>w/o code change bugs root cause distribution</title>
+      <chart id="issue_nocodechange_rca">
+        <search>
+          <query>index=rca_main display_version="$version.value$"  code_change="False"  | stats count by root_cause_type_name| sort count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.1</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="wo_root_cause_type_name">$row.root_cause_type_name$</set>
+        </drilldown>
+      </chart>
+      <chart id="wo_detail_subrootcause" depends="$wo_root_cause_type_name$">
+        <option name="height">150px</option>
+        <title>Detail: $wo_root_cause_type_name$</title>
+        <search>
+          <query>index=rca_main display_version="$version$" code_change="False" "root_cause_type_name"="$wo_root_cause_type_name$" | stats count by "component"| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="wo_component">$row.component$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$" code_change="False" root_cause_type_name="$wo_root_cause_type_name$" component="$wo_component$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h1>
+         Root Cause Analysis By Area 
+        </h1>
+     
+      <ul>
+         <li>Areas mean core backend, core UI, APPs, security, performance, SDK</li>
+         <li>Drill down chart shows issue root cause distribution in the selected area</li>
+      </ul>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>w/ code change bugs area distribution</title>
+      <chart id="w_detail_area">
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution ="Fixed" root_cause_type_name!="NULL" |stats count by area</query>
+        </search>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="w_area">$row.area$</set>
+        </drilldown>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+      </chart>
+      <chart id="w_detail_rc_area" depends="$w_area$">
+        <option name="height">150px</option>
+        <title>Detail: $w_area$</title>
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution="Fixed" area="$w_area$" root_cause_type_name!="NULL"| stats count by root_cause_type_name| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="w_root_cause_type_name">$row.root_cause_type_name$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$" Resolution="Fixed" area="$w_area$" root_cause_type_name="$w_root_cause_type_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>w/o code change bugs area distribution</title>
+      <chart id="wo_detail_area">
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution!="Fixed" root_cause_type_name!="NULL" root_cause_type_name!="Coding flaws" |stats count by area</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="wo_area">$row.area$</set>
+        </drilldown>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+      </chart>
+      <chart id="wo_detail_rc_area" depends="$wo_area$">
+        <option name="height">150px</option>
+        <title>Detail: $w_area$</title>
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution!="Fixed" area="$wo_area$" root_cause_type_name!="NULL" root_cause_type_name!="Coding flaws"| stats count by root_cause_type_name| sort -count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <drilldown>
+          <set token="wo_root_cause_type_name">$row.root_cause_type_name$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$" Resolution!="Fixed" area="$wo_area$" root_cause_type_name="$wo_root_cause_type_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h1>
+         Root Cause Analysis By Components 
+        </h1>
+
+      <ul>
+        <li>Components mean functionality categories, which are almost aligned with JIRA</li>
+        <li>Below chart only shows Top 10 components sorted by the number of customer issues</li>
+        <li>Drill down chart shows bug root cause distribution in the selected component</li>
+      </ul>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>w/ code change bugs component distribution</title>
+      <chart id="w_bug_dis_by_Component">
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution="Fixed" root_cause_type_name!="NULL"| top limit=10 component</query>
+        </search>
+        <!-- Set the type of of drilldown, since we will always consume the same field, use row-->
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="w_component">$row.component$</set>
+        </drilldown>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.1</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+      </chart>
+      <chart id="w_detail_subcomponent" depends="$w_component$">
+        <option name="height">150px</option>
+        <title>Detail: $w_component$</title>
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution="Fixed" component="$w_component$" root_cause_type_name!="NULL"| stats count by root_cause_sub_type_name| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="w_root_cause_sub_type_name">$row.root_cause_sub_type_name$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$" Resolution="Fixed" component="$w_component$" root_cause_sub_type_name="$w_root_cause_sub_type_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>w/o code change bugs component distribution</title>
+      <chart id="wo_bug_dis_by_Component">
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution!="Fixed" root_cause_type_name!="NULL"| top limit=10 component</query>
+        </search>
+        <!-- Set the type of of drilldown, since we will always consume the same field, use row-->
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="wo_component">$row.component$</set>
+        </drilldown>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.1</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+      </chart>
+      <chart id="wo_detail_subcomponent" depends="$wo_component$">
+        <option name="height">150px</option>
+        <title>Detail: $wo_component$</title>
+        <search>
+          <query>index=rca_main display_version="$version$" Resolution!="Fixed" component="$wo_component$" root_cause_type_name!="NULL"| stats count by root_cause_sub_type_name| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="wo_root_cause_sub_type_name">$row.root_cause_sub_type_name$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$" Resolution!="Fixed" component="$wo_component$" root_cause_sub_type_name="$wo_root_cause_sub_type_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       
+      <h1>
+       Customer bug distribution by other quality indicators: regression, migration and platform</h1>
+        
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Regression issue</title>
+      <chart id="migration_rate">
+        <search>
+          <query>index=rca_main display_version="$version$" root_cause_type_name!="NULL"|stats count by regression| eval regression=if(regression="TRUE", "Regression", "Not Regression")</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <eval token="myregression">$row.regression$=="Regression"</eval>
+          <set token="myregression_words">$row.regression$</set>
+        </drilldown>
+      </chart>
+      <chart id="wo_detail_rc_regression" depends="$myregression$">
+        <option name="height">150px</option>
+        <title>Detail: $myregression_words$ issues</title>
+        <search>
+          <query>index=rca_main display_version="$version$" regression="$myregression$" root_cause_type_name!="NULL"| stats count by root_cause_type_name| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="regression_root_cause_type_name">$row.root_cause_type_name$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$" regression="$myregression$" root_cause_type_name="$regression_root_cause_type_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Migration issue</title>
+      <chart>
+        <search>
+          <query>index=rca_main display_version="$version$" root_cause_type_name!="NULL"|stats count by migration| eval migration=if(migration="TRUE", "Migration", "Not Migration")</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <eval token="mymigration">$row.migration$=="Migration"</eval>
+          <set token="mymigration_words">$row.migration$</set>
+        </drilldown>
+      </chart>
+      <chart id="wo_detail_rc_migration" depends="$mymigration$">
+        <option name="height">150px</option>
+        <title>Detail: $mymigration_words$ issues</title>
+        <search>
+          <query>index=rca_main display_version="$version$"  migration="$mymigration$" root_cause_type_name!="NULL"| stats count by root_cause_type_name| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="migration_root_cause_type_name">$row.root_cause_type_name$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$"  migration="$mymigration$" root_cause_type_name="$migration_root_cause_type_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Platfrom specific issue</title>
+      <chart id="platform_detail">
+        <search>
+          <query>index=rca_main display_version="$version$"| stats count(jira_id) by platform_specific</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="platform_specific">$row.platform_specific$</set>
+        </drilldown>
+      </chart>
+      <chart id="wo_detail_rc_ps" depends="$platform_specific$">
+        <option name="height">150px</option>
+        <title>Detail: $platform_specific$ issues</title>
+        <search>
+          <query>index=rca_main display_version="$version$"  platform_specific="$platform_specific$" root_cause_type_name!="NULL"| stats count by root_cause_type_name| sort -count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.backgroundColor">#F5FFFA</option>
+        <option name="charting.fontColor">#000000</option>
+        <option name="charting.legend.masterLegend"></option>
+        <drilldown>
+          <set token="ps_root_cause_type_name">$row.root_cause_type_name$</set>
+          <link>
+            <![CDATA[
+             /app/rca/search?q=index=rca_main display_version="$version$"  platform_specific="$platform_specific$" root_cause_type_name="$ps_root_cause_type_name$"&display.page.search.mode=smart&earliest=$earliest$&latest=$latest$
+            ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+            <h1>
+                Customer bug list
+            </h1>
+            
+        </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Most customer impacted bug list (top 10)</title>
+      <table id="Most_customer_impacted_issue_list">
+        <searchString>index=rca_main display_version="$version$" root_cause_type_name!="NULL"|  sort - related_customer_cases | head 10 |table jira_id, title, related_customer_cases ,root_cause_type_name| rename root_cause_type_name as "root cause type" | rename related_customer_cases as "salesforce cases"</searchString>
+        <!-- Set the type of of drilldown, since we will always consume the same field, use row-->
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>All bug list</title>
+      <table id="jira_issue_list">
+        <searchString>index="rca_main" display_version="$version$" root_cause_type_name!="NULL"|fields jira_id, "root_cause_type_name", "root_cause_sub_type_name", "title" | rename  title as summary, root_cause_type_name as "root cause type", "root_cause_sub_type_name" as "root cause", jira_id as ticket|table ticket,"root cause type", "root cause", summary</searchString>
+        <!-- Set the type of of drilldown, since we will always consume the same field, use row-->
+        <option name="drilldown">row</option>
+        <option name="count">5</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

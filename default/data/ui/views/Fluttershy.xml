@@ -1,0 +1,19 @@
+<dashboard>
+  
+  <label>Fluttershy RCA List</label>
+  <row>
+    <table>
+      <searchString>
+        source="fluttershy.txt" index="rca"|fields ticket,"root cause type", "root cause", "detailed analysis"|table ticket,"root cause type", "root cause", "detailed analysis"
+      </searchString>
+      
+  	  <option name="drilldown">row</option>
+      <drilldown>
+        <link>
+         https://jira.splunk.com/browse/$row.ticket$
+        </link>
+      </drilldown>
+      
+    </table>
+  </row>  
+</dashboard>

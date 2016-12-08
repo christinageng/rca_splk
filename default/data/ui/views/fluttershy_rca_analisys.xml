@@ -1,0 +1,208 @@
+<view template="dashboard.html">
+  <label>Fluttershy RCA Analytic</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="showActionsMenu">false</param>
+  </module>
+  <module name="StaticContentSample" layoutPanel="panel_row2_col1">
+    <param name="text"><![CDATA[
+      <p><b>
+		Custom issue root cause type Dispatch:
+        <br />
+        Click one of the root cause types.
+        <br />This opens a new pie chart to show detailed root cause.
+      </b></p>
+    ]]></param>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row2_col1" autoRun="True">
+    <param name="search">
+      source="fluttershy.txt" index="rca"| stats count by "root cause type"
+    </param>
+    <module name="HiddenChartFormatter">
+      <param name="charting.chart">pie</param>
+      <module name="JobProgressIndicator"/>
+      
+      <!-- The JSChart containing drilldowns -->
+      <module name="JSChart">
+        <param name="width">100%</param>
+        <param name="height">160px</param>
+
+        <!-- Swap out the search to a timechart.  -->
+        <module name="HiddenSearch">
+          <param name="search">
+      			source="fluttershy.txt" index="rca"| stats count by "root cause"
+          </param>
+          <!-- 
+            Grab the value clicked on and put it in a searchterm: series="someSourcetype".
+          -->
+          <module name="ConvertToIntention">
+            <param name="intention">
+              <param name="name">addterm</param>
+              <param name="arg">
+                <param name="root cause type">$click.value$</param>
+              </param>
+              <!-- Tell the addterm intention to put the term in the first search clause no matter what. -->
+              <param name="flags"><list>indexed</list></param>
+            </param>
+
+            <!--
+              Finally, render the search in another JSChart,
+              and throw in a JobProgressIndicator for good measure.
+            -->
+            <module name="JobProgressIndicator"></module>
+
+            <!-- Throw in a header so the user sees what they clicked. -->
+            <module name="SimpleResultsHeader">
+              <param name="entityName">results</param>
+              <param name="headerFormat">Detailed root cause dispatch for "root casue type"=$click.value$</param>
+            </module> <!-- SimpleResultsHeader -->
+            <module name="HiddenChartFormatter">
+              <param name="chart">pie</param>
+              <param name="legend.placement">none</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <param name="height">160px</param>
+              </module> <!-- JSChart -->
+            </module> <!-- HiddenChartFormatter -->
+          </module> <!-- ConvertToIntention -->
+        </module> <!-- HiddenSearch -->
+      </module> <!-- JSChart -->
+    </module> <!-- HiddenChartFormatter -->
+  </module> <!-- HiddenSearch -->
+
+
+  <module name="StaticContentSample" layoutPanel="panel_row2_col2">
+    <param name="text"><![CDATA[
+      <p><b>
+		Custom issue component Dispatch:
+        <br />
+        Click one of the components.
+        <br />This opens a new pie chart to show detailed sub-component dispatch.
+      </b></p>
+    ]]></param>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row2_col2" autoRun="True">
+    <param name="search">
+      source="fluttershy.txt" index="rca"| stats count by component
+    </param>
+    <module name="HiddenChartFormatter">
+      <param name="charting.chart">pie</param>
+      <module name="JobProgressIndicator"/>
+      
+      <!-- The JSChart containing drilldowns -->
+      <module name="JSChart">
+        <param name="width">100%</param>
+        <param name="height">160px</param>
+
+        <!-- Swap out the search to a timechart.  -->
+        <module name="HiddenSearch">
+          <param name="search">
+      			source="fluttershy.txt" index="rca"| stats count by sub_component
+          </param>
+          <!-- 
+            Grab the value clicked on and put it in a searchterm: series="someSourcetype".
+          -->
+          <module name="ConvertToIntention">
+            <param name="intention">
+              <param name="name">addterm</param>
+              <param name="arg">
+                <param name="component">$click.value$</param>
+              </param>
+              <!-- Tell the addterm intention to put the term in the first search clause no matter what. -->
+              <param name="flags"><list>indexed</list></param>
+            </param>
+
+            <!--
+              Finally, render the search in another JSChart,
+              and throw in a JobProgressIndicator for good measure.
+            -->
+            <module name="JobProgressIndicator"></module>
+
+            <!-- Throw in a header so the user sees what they clicked. -->
+            <module name="SimpleResultsHeader">
+              <param name="entityName">results</param>
+              <param name="headerFormat">Detailed sub_component dispatch for component=$click.value$</param>
+            </module> <!-- SimpleResultsHeader -->
+            <module name="HiddenChartFormatter">
+              <param name="chart">pie</param>
+              <param name="legend.placement">none</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <param name="height">160px</param>
+              </module> <!-- JSChart -->
+            </module> <!-- HiddenChartFormatter -->
+          </module> <!-- ConvertToIntention -->
+        </module> <!-- HiddenSearch -->
+      </module> <!-- SimpleResultsTable -->
+    </module> <!-- HiddenChartFormatter -->
+  </module> <!-- HiddenSearch -->
+  
+  
+  <module name="StaticContentSample" layoutPanel="panel_row3_col1">
+    <param name="text"><![CDATA[
+      <p><b>
+		Product Development Suggestions:
+        <br />
+      </b></p>
+    ]]></param>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row3_col1" autoRun="True">
+    <param name="search">
+      source="fluttershy.txt" index="rca" suggestion != "n/a"| stats count AS "Related Custom Issues" by suggestion
+    </param>
+    <module name="HiddenChartFormatter">
+      <param name="chart">bar</param>
+      <module name="JobProgressIndicator"/>
+      
+      <!-- The SimpleResultsTable containing drilldowns -->
+      <module name="SimpleResultsTable">
+        <param name="drilldown">row</param>
+        <param name="entityName">results</param>
+
+        <!-- Throw in a header to tell the user what they clicked on. -->
+        <module name="SimpleResultsHeader">
+          <param name="entityName">results</param>
+          <param name="headerFormat">Suggestion related custom issue list:</param>
+        </module> <!-- SimpleResultsHeader -->
+                
+        <!-- Swap out the search to be a timechart.  -->
+        <module name="HiddenSearch">
+          <param name="search">
+            source="fluttershy.txt" index="rca" suggestion != "n/a"|table ticket, title
+          </param>
+          <!-- Grab the value clicked on and put it in as a searchterm: series="someSourcetype".   -->
+          <module name="ConvertToIntention">
+            <param name="intention">
+              <param name="name">addterm</param>
+              <param name="arg">
+                <param name="suggestion">$click.value$</param>
+              </param>
+              <!-- Tell the addterm intention to put the term in the first search clause no matter what. -->
+              <param name="flags"><list>indexed</list></param>
+            </param>
+
+            <!--
+              Finally, render the search in another JSChart,
+              and throw in a JobProgressIndicator for good measure.
+            -->
+            <module name="JobProgressIndicator"></module>
+            <module name="HiddenChartFormatter">
+              <param name="chart">bar</param>       
+              <module name="SimpleResultsTable">
+                <param name="drilldown">row</param>
+                <param name="entityName">results</param>
+              </module>
+            </module> <!-- HiddenChartFormatter -->
+          </module> <!-- ConvertToIntention -->
+        </module> <!-- HiddenSearch -->
+      </module> <!-- SimpleResultsTable -->
+    </module> <!-- HiddenChartFormatter -->
+  </module> <!-- HiddenSearch -->
+  
+</view>

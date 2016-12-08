@@ -1,0 +1,501 @@
+<dashboard script="rca.js">
+  <label>Splunk Enterprise Customer Bug RCA Followup</label>
+  <row>
+    <panel>
+      <html>
+       <h1>
+         Introduction
+        </h1>
+     
+      <ul>
+        <li>Scope for code change issues.</li>
+        <li>Breakdown RCA result into feature(scrum) level to follow up.</li>
+        <li>Action items progress tracking.</li>
+      </ul>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h1>
+          Search Head Clustering
+        </h1>
+      </html>
+      <single>
+        <title>Total Customer Issues</title>
+        <search>
+          <query>index=rca_action component_id=1| stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <single>
+        <title>Total QA tasks</title>
+        <search>
+          <query>index=rca_action component_id=1 QA_how_to_improve!="N/A" | stats count</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="linkView">search</option>
+      </single>
+      <single>
+        <title>Other Improvement Suggestions</title>
+        <search>
+          <query>index=rca_action component_id=1 Other_how_to_improve!="N/A" | stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>RCA Result Breakdown by Sub Component</title>
+        <search>
+          <query>index=rca_action component_id=1 | stats count by sub_component_name</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <drilldown>
+          <set token="first_subcomponent">$row.sub_component_name$</set>
+        </drilldown>
+      </chart>
+      <chart depends="$first_subcomponent$">
+        <title>Relevant Features</title>
+        <search>
+          <query>index=rca_action component_id=1 sub_component_name="$first_subcomponent$" | stats count by related_features | sort -count</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>QA Action Items Overview</title>
+        <search>
+          <query>index=rca_action component_id=1 QA_how_to_improve!="N/A"| stats count by QA_how_to_improve</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <set token="second_qahow">$row.QA_how_to_improve$</set>
+        </drilldown>
+      </chart>
+      <table depends="$second_qahow$">
+        <title>$second_qahow$ tasks tracking</title>
+        <search>
+          <query>index=rca_action component_id=1  QA_how_to_improve="$second_qahow$"| table  QA_action_items,QA_process_tracking,QA_responsible_person, jira_id| rename QA_action_items  AS "Task Id",  QA_process_tracking as Progress, QA_responsible_person as Owner, jira_id as "Customer Issue"</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">7</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Other improvement suggestion</title>
+        <search>
+          <query>index=rca_action component_id=1 Other_how_to_improve!="N/A"| table jira_id, Other_how_to_improve|rename jira_id  AS "Customer Issue", Other_how_to_improve as "Improve Suggestion"</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">8</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h1>
+          Index Clustering
+        </h1>
+      </html>
+      <single>
+        <title>Total Customer Issues</title>
+        <search>
+          <query>index=rca_action component_id=2| stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <single>
+        <title>Total QA tasks</title>
+        <search>
+          <query>index=rca_action component_id=2 QA_how_to_improve!="N/A" | stats count</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="linkView">search</option>
+      </single>
+      <single>
+        <title>Other Improvement Suggestions</title>
+        <search>
+          <query>index=rca_action component_id=2 Other_how_to_improve!="N/A" | stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>RCA Result Breakdown by Sub Component</title>
+        <search>
+          <query>index=rca_action component_id=2 | stats count by sub_component_name</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <drilldown>
+          <set token="ic_subcomponent">$row.sub_component_name$</set>
+        </drilldown>
+      </chart>
+      <chart depends="$ic_subcomponent$">
+        <title>Relevant Features</title>
+        <search>
+          <query>index=rca_action component_id=2 sub_component_name="$ic_subcomponent$" | stats count by related_features | sort -count</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>QA Action Items Overview</title>
+        <search>
+          <query>index=rca_action component_id=2 QA_how_to_improve!="N/A"| stats count by QA_how_to_improve</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <set token="ic_qahow">$row.QA_how_to_improve$</set>
+        </drilldown>
+      </chart>
+      <table depends="$ic_qahow$">
+        <title>$ic_qahow$ tasks tracking</title>
+        <search>
+          <query>index=rca_action component_id=2  QA_how_to_improve="$ic_qahow$"| table  QA_action_items,QA_process_tracking,QA_responsible_person, jira_id| rename QA_action_items  AS "Task Id",  QA_process_tracking as Progress, QA_responsible_person as Owner, jira_id as "Customer Issue"</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">None</option>
+        <option name="count">7</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Other improvement suggestion</title>
+        <search>
+          <query>index=rca_action component_id=2 Other_how_to_improve!="N/A"| table jira_id, Other_how_to_improve|rename jira_id  AS "Customer Issue", Other_how_to_improve as "Improve Suggestion"</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">None</option>
+        <option name="count">8</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h1>
+          Index Processor
+        </h1>
+      </html>
+      <single>
+        <title>Total Customer Issues</title>
+        <search>
+          <query>index=rca_action component_id=3| stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+      <single>
+        <title>Total QA tasks</title>
+        <search>
+          <query>index=rca_action component_id=3 QA_how_to_improve!="N/A" | stats count</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="linkView">search</option>
+      </single>
+      <single>
+        <title>Other Improvement Suggestions</title>
+        <search>
+          <query>index=rca_action component_id=3 Other_how_to_improve!="N/A" | stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>RCA Result Breakdown by Sub Component</title>
+        <search>
+          <query>index=rca_action component_id=3 | stats count by sub_component_name</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <drilldown>
+          <set token="ip_subcomponent">$row.sub_component_name$</set>
+        </drilldown>
+      </chart>
+      <chart depends="$ip_subcomponent$">
+        <title>Relevant Features</title>
+        <search>
+          <query>index=rca_action component_id=3 sub_component_name="$ip_subcomponent$" | stats count by related_features | sort -count</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>QA Action Items Overview</title>
+        <search>
+          <query>index=rca_action component_id=3 QA_how_to_improve!="N/A"| stats count by QA_how_to_improve</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <set token="ip_qahow">$row.QA_how_to_improve$</set>
+        </drilldown>
+      </chart>
+      <table depends="$ip_qahow$">
+        <title>$ip_qahow$ tasks tracking</title>
+        <search>
+          <query>index=rca_action component_id=3  QA_how_to_improve="$ip_qahow$"| table  QA_action_items,QA_process_tracking,QA_responsible_person, jira_id| rename QA_action_items  AS "Task Id",  QA_process_tracking as Progress, QA_responsible_person as Owner, jira_id as "Customer Issue"</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">7</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Other improvement suggestion</title>
+        <search>
+          <query>index=rca_action component_id=3 Other_how_to_improve!="N/A"| table jira_id, Other_how_to_improve|rename jira_id  AS "Customer Issue", Other_how_to_improve as "Improve Suggestion"</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">None</option>
+        <option name="count">8</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h1>
+          QA action item list
+       </h1>
+      </html>
+      <table>
+        <search>
+          <query>index=rca_action QA_how_to_improve!="N/A" |stats count as Count by QA_how_to_improve, sub_component_name |sort -Sum |stats list(QA_how_to_improve) as "QA Action Item", list(Count) as "Test Case/Scenario Count" by sub_component_name |rename sub_component_name AS Component</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">30</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,10 @@
+susqa label,meanings
+susqa_check,Need more verification points
+susqa_boundary,Need more boundary checks
+susqa_scenario,Need to add tests for the feature area
+susqa_combination,Need to add integration test for combination different worked features
+susqa_negative,Need to add more negative cases
+susqa_perf,Performance downgrade 
+susqa_memory,Memory usage problem
+susqa_message,Message/log unclear/unwanted
+Not labeled,can_t be reproduced or feature request/documentations

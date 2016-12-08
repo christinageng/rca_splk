@@ -1,0 +1,83 @@
+[app/ui]
+version = 6.4.0
+modtime = 1458369031.226281000
+
+[app/launcher]
+version = 6.4.0
+modtime = 1458369031.254041000
+
+[workflow_actions/ticket]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.4.0
+modtime = 1457314121.544615000
+
+[views/Fluttershy]
+owner = admin
+version = 6.4.0
+modtime = 1458025364.909397000
+
+[views/fluttershy_rca_analisys]
+owner = admin
+version = 6.4.0
+modtime = 1458123289.995887000
+
+[app/package/check_for_updates]
+version = 6.4.0
+modtime = 1458369031.276761000
+
+[views/Galaxy_RCA_report]
+access = read : [ * ], write : [ admin, power ]
+export = none
+owner = admin
+version = 6.4.0
+modtime = 1464069925.356981000
+
+[app/install/install_source_checksum]
+version = 6.4.0
+modtime = 1458412153.411313000
+
+[lookups/susqa_label.csv]
+export = none
+owner = admin
+version = 6.4.0
+modtime = 1458572493.704939000
+
+[inputs/monitor%3A%2F%2F%2Froot%2Fsplunk%2Fetc%2Fapps%2Frca%2Fdata]
+owner = admin
+version = 6.4.0
+modtime = 1460080071.886918000
+
+[views/RCA_homepage]
+version = 6.4.0
+modtime = 1480414999.502167000
+
+[views/RCA_report]
+version = 6.4.0
+modtime = 1481082382.939214000
+
+[workflow_actions/JIRATicket]
+export = none
+owner = admin
+version = 6.4.0
+modtime = 1465376438.947108000
+
+[views/RCA_comparison]
+version = 6.4.0
+modtime = 1480327319.510222000
+
+[transforms/REPORT-resolution]
+owner = admin
+version = 6.4.0
+modtime = 1477906836.422718000
+
+[props/csv/REPORT-resolution]
+access = read : [ * ], write : [ admin ]
+owner = admin
+version = 6.4.0
+modtime = 1477906836.526142000
+
+[views/RCA_actions]
+version = 6.4.0
+modtime = 1480327395.866296000
